@@ -2,9 +2,14 @@
 
 module Main where
 
-import qualified Brick        as B
-import qualified Graphics.Vty as Vty
-import qualified Mortar       as M
+import qualified Brick                     as B
+import           Control.Exception         (bracket)
+import qualified Graphics.Vty              as Vty
+import qualified Mortar                    as M
+import qualified System.Log.Formatter      as Log
+import qualified System.Log.Handler        as LogH
+import qualified System.Log.Handler.Simple as Log
+import qualified System.Log.Logger         as Log
 
 import qualified TwoForms
 
@@ -17,10 +22,25 @@ main =
     , M.liftVtyEvent = TwoForms.VtyEvent
     , M.render = TwoForms.render
     , M.handleRequest = TwoForms.handleRequest
-    , M.runHandlerM = id
+    , M.runHandlerM = runWithLogging
     , M.haltRequest = TwoForms.QuitRequest
     , M.mkAttrMap =
         const $ B.attrMap Vty.defAttr
           [ ("selected" , Vty.white `B.on` Vty.black)
           ]
     }
+
+
+runWithLogging :: IO () -> IO ()
+runWithLogging body =
+  bracket
+    (Log.fileHandler "debug.log" Log.DEBUG >>=
+     \lh ->
+       return $ LogH.setFormatter lh (Log.simpleLogFormatter "[$time : $loggername : $prio] $msg"))
+    LogH.close
+    $ \h -> do
+      Log.updateGlobalLogger
+        Log.rootLoggerName
+        (Log.setLevel Log.DEBUG . Log.setHandlers [h])
+
+      body

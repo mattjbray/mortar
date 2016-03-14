@@ -174,10 +174,10 @@ handleRequest request =
       return NoAction
 
     Form1Request formRequest ->
-      Form1Action <$> Form.handleRequest formRequest
+      Form1Action <$> Form.handleRequest "Form1" formRequest
 
     Form2Request formRequest ->
-      Form2Action <$> Form.handleRequest formRequest
+      Form2Action <$> Form.handleRequest "Form2" formRequest
 
 
 render :: Model -> B.Widget

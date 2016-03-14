@@ -47,6 +47,7 @@ executable example-readme
   build-depends:       base >= 4.7 && < 5
                      , brick >= 0.4
                      , bytestring >= 0.10
+                     , hslogger >= 1.2.9
                      , mortar
                      , text-zipper >= 0.3
                      , vty >= 5.4

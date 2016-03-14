@@ -15,8 +15,9 @@ module Form
 import           Brick               ((<+>), (<=>))
 import qualified Brick               as B
 import           Control.Applicative ((<|>))
-import Control.Concurrent (threadDelay)
+import           Control.Concurrent  (threadDelay)
 import qualified Graphics.Vty        as Vty
+import qualified System.Log.Logger   as Log
 
 import qualified TextBox
 
@@ -53,6 +54,7 @@ data Action
 
 data Request
   = DelayToggleTextBoxActive
+  | LogSubmitted String
   deriving Eq
 
 
@@ -97,7 +99,7 @@ update model action =
                    { submittedContent = Just content
                    , textBoxActive = False
                    }
-               , DelayToggleTextBoxActive : requests
+               , LogSubmitted content : DelayToggleTextBoxActive : requests
                )
         else
           Nothing
@@ -147,9 +149,13 @@ render model =
       ]
 
 
-handleRequest :: Request -> IO Action
-handleRequest request =
+handleRequest :: String -> Request -> IO Action
+handleRequest thisName request =
   case request of
     DelayToggleTextBoxActive -> do
       threadDelay (2 * 10 ^ (5 :: Int))
       return ToggleTextBoxActive
+
+    LogSubmitted content -> do
+      Log.debugM ("MyApp." ++ thisName) ("User submitted: " ++ content)
+      return NoAction
