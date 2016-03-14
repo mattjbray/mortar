@@ -105,5 +105,30 @@ handleRequest request =
       ...
 ```
 
+Notice the parent itself can be nested in a containing component, and the
+containing component does not need to know anything about the internal workings
+of the child.
+
+
+## Handling `Vty` `Event`s
+
+Typically, components that handle events from `Vty` (the terminal library
+underlying `brick`) will define an action to carry `Vty` `Event`s and export it:
+
+```haskell
+module MyComponenet (Action(VtyEvent), ...) where
+
+data Action
+  = VtyEvent Vty.Event
+  | MyAction
+```
+
+When it receives a `VtyEvent`, a child's `update` may handle the event, or it
+may return `Nothing` to signal that the event was not handled. In that case, the
+parent component may decide to handle the event itself.
+
+See the [TwoForms](/exaples/TwoForms) example for an implementation of this
+pattern.
+
 [brick]: https://github.com/jtdaugherty/brick
 [the elm architecture]: https://github.com/evancz/elm-architecture-tutorial
