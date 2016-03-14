@@ -76,7 +76,7 @@ update model action =
     VtyEvent event ->
       handleTopLevelVtyEvent model event
       <|>
-      deferToForms model (Form.VtyEvent event)
+      deferToActiveForm model (Form.VtyEvent event)
 
     ToggleActiveForm ->
       let
@@ -125,8 +125,8 @@ vtyEventToAction event =
       Nothing
 
 
-deferToForms :: Model -> Form.Action -> Maybe (Model, [Request])
-deferToForms model =
+deferToActiveForm :: Model -> Form.Action -> Maybe (Model, [Request])
+deferToActiveForm model =
   deferToForm (selection model) model
 
 
