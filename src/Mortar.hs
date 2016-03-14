@@ -12,8 +12,6 @@ module Mortar
 import qualified Brick.AttrMap          as A
 import qualified Brick.Main             as M
 import qualified Brick.Types            as T
-import           Brick.Util             (on)
-import qualified Brick.Widgets.List     as L
 import           Control.Concurrent     (Chan, forkIO, newChan, readChan,
                                          writeChan, writeList2Chan)
 import           Control.Monad          (forever, void)
@@ -57,6 +55,7 @@ data Config model action request handlerM = Config
   , runHandlerM   :: handlerM () -> IO ()
     -- | When your @update@ function returns this @request@, the app will exit.
   , haltRequest   :: request
+  , mkAttrMap     :: model -> A.AttrMap
   }
 
 {-| Start a Mortar application with a @Config@.
@@ -91,12 +90,6 @@ start Config{..} = do
       model
 
   where
-    mkAttrMap :: A.AttrMap
-    mkAttrMap =
-      A.attrMap
-        Vty.defAttr
-        [ (L.listSelectedAttr, Vty.white `on` Vty.black) ]
-
     mkApp
       :: Chan request
       -> M.App model action
@@ -106,7 +99,7 @@ start Config{..} = do
         , M.appChooseCursor = M.showFirstCursor
         , M.appHandleEvent = appHandleEvent requestChan
         , M.appStartEvent = return
-        , M.appAttrMap = const mkAttrMap
+        , M.appAttrMap = mkAttrMap
         , M.appLiftVtyEvent = liftVtyEvent
         }
 
