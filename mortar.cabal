@@ -10,8 +10,12 @@ maintainer:          mattjbray@gmail.com
 copyright:           2016 Matthew Bray
 category:            Graphics
 build-type:          Simple
--- extra-source-files:
+extra-source-files:  README.md
 cabal-version:       >=1.10
+
+flag examples
+  Description:       Build example programs
+  Default:           False
 
 library
   hs-source-dirs:      src
@@ -35,3 +39,17 @@ test-suite mortar-test
 source-repository head
   type:     git
   location: https://github.com/mattjbray/mortar
+
+executable example-readme
+  if !flag(examples)
+    Buildable:         False
+  main-is:             Main.hs
+  build-depends:       base >= 4.7 && < 5
+                     , brick >= 0.4
+                     , bytestring >= 0.10
+                     , mortar
+                     , text-zipper >= 0.3
+                     , vty >= 5.4
+  hs-source-dirs:      examples/readme
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
