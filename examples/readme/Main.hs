@@ -33,14 +33,16 @@ main =
 
 runWithLogging :: IO () -> IO ()
 runWithLogging body =
-  bracket
-    (Log.fileHandler "debug.log" Log.DEBUG >>=
-     \lh ->
-       return $ LogH.setFormatter lh (Log.simpleLogFormatter "[$time : $loggername : $prio] $msg"))
-    LogH.close
-    $ \h -> do
-      Log.updateGlobalLogger
-        Log.rootLoggerName
-        (Log.setLevel Log.DEBUG . Log.setHandlers [h])
+  bracket initLogger LogH.close $ \h -> do
+    Log.updateGlobalLogger
+      Log.rootLoggerName
+      (Log.setLevel Log.DEBUG . Log.setHandlers [h])
 
-      body
+    body
+  where
+    initLogger =
+      Log.fileHandler "debug.log" Log.DEBUG >>= \handler ->
+        return $
+          LogH.setFormatter
+            handler
+            (Log.simpleLogFormatter  "[$time : $loggername : $prio] $msg")
