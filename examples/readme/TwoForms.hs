@@ -186,7 +186,7 @@ render model =
   <+>
   B.hCenter (Form.render (snd (forms model)))
   <=>
-  (B.hCenter . B.str . unlines)
+  (B.padTop B.Max . B.hCenter . B.str . unlines)
     [ ""
     , "Currently selected: " ++ show (selection model)
     , ""
