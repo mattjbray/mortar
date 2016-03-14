@@ -80,22 +80,22 @@ update model action =
 
     ToggleActiveForm ->
       let
-        (newSelection, form1Active, form2Active) =
-          case selection model of
-            Nothing ->
-              (Just LeftForm, True, False)
-            Just LeftForm ->
-              (Just RightForm, False, True)
-            Just RightForm ->
-              (Nothing, False, False)
+        newSelection = nextSelection (selection model)
         (model', requests1) =
           fromMaybe (model, []) $
-            deferToForm (Just LeftForm) model (Form.SetFocus form1Active)
+            deferToForm
+              (Just LeftForm)
+              model
+              (Form.SetFocus (isForm1Active newSelection))
         (model'', requests2) =
           fromMaybe (model', []) $
-            deferToForm (Just RightForm) model' (Form.SetFocus form2Active)
+            deferToForm
+              (Just RightForm)
+              model'
+              (Form.SetFocus (isForm2Active newSelection))
       in
-        Just ( model'' { selection = newSelection }
+        Just ( model''
+                 { selection = newSelection }
              , requests1 ++ requests2
              )
 
@@ -104,6 +104,22 @@ update model action =
 
     Form2Action formAction ->
       deferToForm (Just RightForm) model formAction
+
+
+nextSelection :: Maybe Selection -> Maybe Selection
+nextSelection Nothing = Just LeftForm
+nextSelection (Just LeftForm) = Just RightForm
+nextSelection (Just RightForm) = Nothing
+
+
+isForm1Active :: Maybe Selection -> Bool
+isForm1Active (Just LeftForm) = True
+isForm1Active _ = False
+
+
+isForm2Active :: Maybe Selection -> Bool
+isForm2Active (Just RightForm) = True
+isForm2Active _ = False
 
 
 handleTopLevelVtyEvent :: Model -> Vty.Event -> Maybe (Model, [Request])
