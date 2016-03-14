@@ -64,8 +64,8 @@ data Model = Model
 The parent defines `Action`s and `Request`s to wrap the child's:
 
 ```haskell
-data Action = ChildAction Child.Action
-data Request = ChildRequest Child.Request
+data Action = ChildAction Child.Action | ParentAction1 | ...
+data Request = ChildRequest Child.Request | ParentRequest1 | ...
 ```
 
 The parent's `initModelRequests` function will initialise the child:
@@ -90,6 +90,8 @@ update model action =
       Just ( model { child = childModel }
            , ChildRequest <$> childRequests
            )
+    ParentAction1 ->
+      ...
 ```
 
 And the `handleRequest` function dispatches `Requests` to the child:
@@ -99,6 +101,8 @@ handleRequest request =
   case request of
     ChildRequest childRequest -> do
       ChildAction <$> Child.handleRequest childRequest
+    ParentRequest1 -> do
+      ...
 ```
 
 [brick]: https://github.com/jtdaugherty/brick
