@@ -1,4 +1,4 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Form
   ( Model
@@ -12,12 +12,13 @@ module Form
   where
 
 
-import           Brick               ((<+>), (<=>))
-import qualified Brick               as B
-import           Control.Applicative ((<|>))
-import           Control.Concurrent  (threadDelay)
-import qualified Graphics.Vty        as Vty
-import qualified System.Log.Logger   as Log
+import           Brick                ((<+>), (<=>))
+import qualified Brick                as B
+import qualified Brick.Widgets.Border as B
+import           Control.Applicative  ((<|>))
+import           Control.Concurrent   (threadDelay)
+import qualified Graphics.Vty         as Vty
+import qualified System.Log.Logger    as Log
 
 import qualified TextBox
 
@@ -137,9 +138,9 @@ render model =
       else
         (B.withAttr "selected", id)
   in
-    (mkTextBoxFocus . B.hLimit 40 . B.padRight (B.Pad 40) . TextBox.render . textBox) model
+    (mkTextBoxFocus . B.border . B.hLimit 40 . B.padRight (B.Pad 40) . TextBox.render . textBox) model
     <+>
-    (mkButtonFocus . B.padLeftRight 3 . B.str) "submit"
+    (mkButtonFocus . B.border . B.padLeftRight 3 . B.str) "Submit"
     <=>
     (B.str . unlines)
       [ ""

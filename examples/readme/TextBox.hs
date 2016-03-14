@@ -9,10 +9,11 @@ module TextBox
   ) where
 
 
-import qualified Brick            as B
-import           Data.List        (intercalate)
-import qualified Data.Text.Zipper as Z
-import qualified Graphics.Vty     as Vty
+import qualified Brick                as B
+import qualified Brick.Widgets.Border as B
+import           Data.List            (intercalate)
+import qualified Data.Text.Zipper     as Z
+import qualified Graphics.Vty         as Vty
 
 
 data Model = Model
@@ -102,10 +103,12 @@ render model =
   let
     content = getContent model
   in
-    if null content then
-      B.str "enter some text"
-    else
-      B.str content
+    B.str $
+      if null content then
+        "enter some text"
+      else
+        content
+
 
 getContent :: Model -> String
 getContent =
