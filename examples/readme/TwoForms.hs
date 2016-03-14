@@ -41,7 +41,7 @@ initModelRequests =
         { forms =
             (form1Model, form2Model)
         , selection =
-            Nothing
+            Just LeftForm
         }
     , (Form1Request <$> form1Reqs) ++ (Form2Request <$> form2Reqs)
     )
