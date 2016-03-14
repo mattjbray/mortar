@@ -3,7 +3,7 @@
 module Form
   ( Model
   , initModelRequests
-  , Action(VtyEvent)
+  , Action(VtyEvent, SetFocus)
   , update
   , Request
   , handleRequest
@@ -27,11 +27,12 @@ data Model = Model
   { textBox          :: TextBox.Model
   , textBoxActive    :: Bool
   , submittedContent :: Maybe String
+  , hasFocus         :: Bool
   }
 
 
-initModelRequests :: (Model, [Request])
-initModelRequests =
+initModelRequests :: Bool -> (Model, [Request])
+initModelRequests focus =
   let
     (tbox, _) =
       TextBox.initModelRequests
@@ -40,6 +41,7 @@ initModelRequests =
         { textBox = tbox
         , textBoxActive = True
         , submittedContent = Nothing
+        , hasFocus = focus
         }
     , []
     )
@@ -50,6 +52,7 @@ data Action
   | TextBoxAction TextBox.Action
   | ToggleTextBoxActive
   | Submit
+  | SetFocus Bool
   | NoAction
 
 
@@ -105,6 +108,11 @@ update model action =
         else
           Nothing
 
+    SetFocus focus ->
+      Just ( model { hasFocus = focus }
+           , []
+           )
+
 
 handleTopLevelVtyEvent :: Model -> Vty.Event -> Maybe (Model, [Request])
 handleTopLevelVtyEvent model event = do
@@ -132,11 +140,13 @@ deferToTextBox model textBoxAction = do
 render :: Model -> B.Widget
 render model =
   let
-    (mkButtonFocus, mkTextBoxFocus) =
-      if textBoxActive model then
-        (id, B.withAttr "selected")
-      else
-        (B.withAttr "selected", id)
+    (mkButtonFocus, mkTextBoxFocus)
+      | not (hasFocus model) =
+          (id, id)
+      | textBoxActive model =
+          (id, B.withAttr "selected")
+      | otherwise =
+          (B.withAttr "selected", id)
   in
     ( mkTextBoxFocus
       . B.border

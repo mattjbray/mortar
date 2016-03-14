@@ -8,10 +8,11 @@ module TwoForms
   , render
   ) where
 
-import           Brick               ((<+>), (<=>))
+import           Brick                ((<+>), (<=>))
 import qualified Brick                as B
 import qualified Brick.Widgets.Center as B
 import           Control.Applicative  ((<|>))
+import           Data.Maybe           (fromMaybe)
 import qualified Graphics.Vty         as Vty
 
 import qualified Form
@@ -33,9 +34,9 @@ initModelRequests :: (Model, [Request])
 initModelRequests =
   let
     (form1Model, form1Reqs) =
-      Form.initModelRequests
+      Form.initModelRequests True
     (form2Model, form2Reqs) =
-      Form.initModelRequests
+      Form.initModelRequests False
   in
     ( Model
         { forms =
@@ -79,17 +80,23 @@ update model action =
 
     ToggleActiveForm ->
       let
-        newSelection =
+        (newSelection, form1Active, form2Active) =
           case selection model of
             Nothing ->
-              Just LeftForm
-            Just LeftForm->
-              Just RightForm
+              (Just LeftForm, True, False)
+            Just LeftForm ->
+              (Just RightForm, False, True)
             Just RightForm ->
-              Nothing
+              (Nothing, False, False)
+        (model', requests1) =
+          fromMaybe (model, []) $
+            deferToForm (Just LeftForm) model (Form.SetFocus form1Active)
+        (model'', requests2) =
+          fromMaybe (model', []) $
+            deferToForm (Just RightForm) model' (Form.SetFocus form2Active)
       in
-        Just ( model { selection = newSelection }
-             , []
+        Just ( model'' { selection = newSelection }
+             , requests1 ++ requests2
              )
 
     Form1Action formAction ->
