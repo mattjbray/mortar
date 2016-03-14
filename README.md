@@ -40,9 +40,9 @@ The `Model` represents the entire state of the component.
 `Action`s are the only way to evolve the `Model`, via the `update` function.
 
 In processing an `Action`, the `update` function may generate `Request`s. These
-will be passed to `handleRequest`, which run off the main thread and can perform
-IO. `Request` handlers return an `Action`, which in turn is passed back to
-`update`.
+will be passed to `handleRequest`, which runs in a separate thread and can
+perform IO. `Request` handlers return an `Action`, which in turn is passed back
+to `update`.
 
 `initModelRequests` defines how the component should be initialised.
 
@@ -128,7 +128,7 @@ When it receives a `VtyEvent`, a child's `update` may handle the event, or it
 may return `Nothing` to signal that the event was not handled. In that case, the
 parent component may decide to handle the event itself.
 
-See the [TwoForms](/exaples/TwoForms) example for an implementation of this
+See the [TwoForms](/examples/TwoForms) example for an implementation of this
 pattern.
 
 [brick]: https://github.com/jtdaugherty/brick
