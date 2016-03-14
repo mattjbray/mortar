@@ -15,8 +15,8 @@ See [src/Mortar.hs](/src/Mortar.hs) for documentation and check the
 * We want any (nested) component to be able to perform IO.
 
 In [`brick`][brick], the event handlers run in the `EventM (Next s)` monad.
-However, the `Next` data constructors are hidden, which means that components
-cannot be arbitrarily nested, as the parent component would have to deconstruct
+However, the `Next` data constructors are hidden. This means that components
+cannot be arbitrarily nested -- the parent component would have to deconstruct
 the `Next` value in order to compose the responses of its children.
 
 
@@ -40,8 +40,9 @@ The `Model` represents the entire state of the component.
 `Action`s are the only way to evolve the `Model`, via the `update` function.
 
 In processing an `Action`, the `update` function may generate `Request`s. These
-will be passed to `handleRequest`, which can perform IO and generate a new
-`Action`.
+will be passed to `handleRequest`, which run off the main thread and can perform
+IO. `Request` handlers return an `Action`, which in turn is passed back to
+`update`.
 
 `initModelRequests` defines how the component should be initialised.
 
@@ -105,7 +106,7 @@ handleRequest request =
       ...
 ```
 
-Notice the parent itself can be nested in a containing component, and the
+Notice that the parent itself can be nested in a containing component, and the
 containing component does not need to know anything about the internal workings
 of the child.
 
