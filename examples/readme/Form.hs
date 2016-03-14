@@ -138,9 +138,17 @@ render model =
       else
         (B.withAttr "selected", id)
   in
-    (mkTextBoxFocus . B.border . B.hLimit 40 . B.padRight (B.Pad 40) . TextBox.render . textBox) model
+    ( mkTextBoxFocus
+      . B.border
+      . B.hLimit 40
+      . B.padRight (B.Pad 40)
+      . TextBox.render
+      . textBox ) model
     <+>
-    (mkButtonFocus . B.border . B.padLeftRight 3 . B.str) "Submit"
+    ( mkButtonFocus
+      . B.border
+      . B.padLeftRight 3
+      . B.str ) "Submit"
     <=>
     (B.str . unlines)
       [ ""
