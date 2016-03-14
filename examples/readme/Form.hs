@@ -33,18 +33,14 @@ data Model = Model
 
 initModelRequests :: Bool -> (Model, [Request])
 initModelRequests focus =
-  let
-    (tbox, _) =
-      TextBox.initModelRequests
-  in
-    ( Model
-        { textBox = tbox
-        , textBoxActive = True
-        , submittedContent = Nothing
-        , hasFocus = focus
-        }
-    , []
-    )
+  ( Model
+      { textBox = TextBox.initModel
+      , textBoxActive = True
+      , submittedContent = Nothing
+      , hasFocus = focus
+      }
+  , []
+  )
 
 
 data Action
@@ -130,7 +126,7 @@ maybeDeferToTextBox model textBoxAction =
 
 deferToTextBox :: Model -> TextBox.Action -> Maybe (Model, [Request])
 deferToTextBox model textBoxAction = do
-  (textBoxModel, _) <-
+  textBoxModel <-
     TextBox.update (textBox model) textBoxAction
   Just ( model { textBox = textBoxModel }
        , []

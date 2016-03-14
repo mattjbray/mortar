@@ -1,8 +1,7 @@
 module TextBox
   ( Model
-  , initModelRequests
+  , initModel
   , Action(VtyEvent, Clear)
-  , Request
   , update
   , render
   , getContent
@@ -10,7 +9,6 @@ module TextBox
 
 
 import qualified Brick                as B
-import qualified Brick.Widgets.Border as B
 import           Data.List            (intercalate)
 import qualified Data.Text.Zipper     as Z
 import qualified Graphics.Vty         as Vty
@@ -21,11 +19,11 @@ data Model = Model
   }
 
 
-initModelRequests :: (Model, [Request])
-initModelRequests =
-  ( Model (Z.stringZipper [] (Just 1))
-  , []
-  )
+initModel :: Model
+initModel =
+  Model
+    { zipper = Z.stringZipper [] (Just 1)
+    }
 
 
 data Action
@@ -65,7 +63,7 @@ data Request
   deriving Eq
 
 
-update :: Model -> Action -> Maybe (Model, [Request])
+update :: Model -> Action -> Maybe Model
 update model action =
   case action of
     VtyEvent event -> do
@@ -88,14 +86,12 @@ update model action =
       applyEdit Z.moveRight model
 
     Clear ->
-      Just initModelRequests
+      Just initModel
 
 
-applyEdit :: (Z.TextZipper String -> Z.TextZipper String) -> Model -> Maybe (Model, [Request])
+applyEdit :: (Z.TextZipper String -> Z.TextZipper String) -> Model -> Maybe Model
 applyEdit f model =
-  Just ( model { zipper = f (zipper model) }
-       , []
-       )
+  Just model { zipper = f (zipper model) }
 
 
 render :: Model -> B.Widget
