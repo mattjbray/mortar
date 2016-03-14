@@ -19,6 +19,9 @@ However, the `Next` data constructors are hidden, which means that components
 cannot be arbitrarily nested, as the parent component would have to deconstruct
 the `Next` value in order to compose the responses of its children.
 
+
+## Overview
+
 In `mortar`, we take a different approach. Each component is represented by a
 module exporting the following definitions:
 
@@ -43,6 +46,60 @@ will be passed to `handleRequest`, which can perform IO and generate a new
 `initModelRequests` defines how the component should be initialised.
 
 Finally, `render` renders the current component state to a `brick` `Widget`.
+
+
+## Nesting components
+
+A parent component is responsible for threading `Actions` and `Requests` through
+to its children's `update` and `handleRequest` functions.
+
+The parent's `Model` will embed the child's:
+
+```haskell
+module Parent where
+data Model = Model
+  { child :: Child.Model }
+```
+
+The parent defines `Action`s and `Request`s to wrap the child's:
+
+```haskell
+data Action = ChildAction Child.Action
+data Request = ChildRequest Child.Request
+```
+
+The parent's `initModelRequests` function will initialise the child:
+
+```haskell
+initModelRequests =
+  let (childModel, childRequests) =
+        Child.initModelRequests
+  in  ( Model { child = childModel }
+      , ChildRequest <$> childRequests
+      )
+```
+
+The parent's `update` function will dispatch `Actions` to the child:
+
+```haskell
+update model action =
+  case action of
+    ChildAction childAction -> do
+      (childModel, childRequests) <-
+        Child.update (child model) childAction
+      Just ( model { child = childModel }
+           , ChildRequest <$> childRequests
+           )
+```
+
+And the `handleRequest` function dispatches `Requests` to the child:
+
+```haskell
+handleRequest request =
+  case request of
+    ChildRequest childRequest -> do
+      ChildAction <$> Child.handleRequest childRequest
+```
 
 [brick]: https://github.com/jtdaugherty/brick
 [the elm architecture]: https://github.com/evancz/elm-architecture-tutorial
