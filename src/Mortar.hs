@@ -115,9 +115,6 @@ start Config{..} = do
         Just (model', requests)
           | requests == [haltRequest] ->
               M.halt model'
-          | null requests ->
+          | otherwise -> do
+              liftIO $ writeList2Chan requestChan requests
               M.continue model'
-          | otherwise ->
-              M.suspendAndResume $ do
-                writeList2Chan requestChan requests
-                return model'
