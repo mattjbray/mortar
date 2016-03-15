@@ -14,16 +14,14 @@ See [src/Mortar.hs](/src/Mortar.hs) for documentation and check the
 
 * We want any (nested) component to be able to perform IO.
 
-In [`brick`][brick], the event handlers run in the `EventM (Next s)` monad.
-However, the `Next` data constructors are hidden. This means that components
-cannot be arbitrarily nested -- the parent component would have to deconstruct
-the `Next` value in order to compose the responses of its children.
+TODO: verify whether there is any benefit to this architecture over `brick`'s
+own `HandleEvent` type class.
 
 
 ## Overview
 
-In `mortar`, we take a different approach. Each component is represented by a
-module exporting the following definitions:
+In `mortar`, each component is represented by a module exporting the following
+definitions:
 
 ```haskell
 data Model
